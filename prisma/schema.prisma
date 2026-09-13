@@ -1,0 +1,115 @@
+// P&L + presentation schema.
+//
+// Period model: months are the source of truth. Quarter FiscalPeriod rows exist
+// so the canvas can address "2025-Q3", but quarter amounts are never stored as
+// facts. The query layer rolls three months up (see src/lib/pnl/rollup.ts).
+//
+// Postgres-ready: swap `provider` to "postgresql" and point DATABASE_URL at
+// Postgres. Types used here (String ids, Decimal, DateTime, Json, enums as
+// strings) map cleanly. Recreate the migration for that engine.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  currency  String   @default("USD")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  periods FiscalPeriod[]
+  facts   PlFact[]
+  decks   Deck[]
+}
+
+/// Calendar-aligned fiscal period. `periodKey` is unique per company
+/// ("2025-Q3" or "2025-07") so nullable month/quarter do not break uniqueness
+/// on SQLite (NULL != NULL in unique indexes).
+model FiscalPeriod {
+  id         String   @id @default(cuid())
+  companyId  String
+  grain      String
+  fiscalYear Int
+  quarter    Int?
+  month      Int?
+  periodKey  String
+  label      String
+  startDate  DateTime
+  endDate    DateTime
+
+  company Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  facts   PlFact[]
+
+  @@unique([companyId, periodKey])
+  @@index([companyId, grain, fiscalYear])
+}
+
+model LineItem {
+  id        String  @id @default(cuid())
+  code      String  @unique
+  name      String
+  section   String
+  sortOrder Int
+  isDerived Boolean @default(false)
+  formula   String?
+
+  facts PlFact[]
+}
+
+/// Stored only for leaf (non-derived) line items on MONTH periods.
+model PlFact {
+  id         String  @id @default(cuid())
+  companyId  String
+  periodId   String
+  lineItemId String
+  amount     Decimal
+
+  company  Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  period   FiscalPeriod @relation(fields: [periodId], references: [id], onDelete: Cascade)
+  lineItem LineItem     @relation(fields: [lineItemId], references: [id], onDelete: Cascade)
+
+  @@unique([periodId, lineItemId])
+  @@index([companyId, periodId])
+}
+
+model Deck {
+  id        String   @id @default(cuid())
+  companyId String
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  scenes  Scene[]
+}
+
+model Scene {
+  id        String   @id @default(cuid())
+  deckId    String
+  title     String
+  sortOrder Int
+  layout    Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  deck    Deck          @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  prompts PromptEvent[]
+}
+
+model PromptEvent {
+  id        String   @id @default(cuid())
+  sceneId   String
+  prompt    String
+  message   String
+  createdAt DateTime @default(now())
+
+  scene Scene @relation(fields: [sceneId], references: [id], onDelete: Cascade)
+}

@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  background: radial-gradient(1200px 700px at 20% -10%, #163246 0%, transparent 55%),
+    radial-gradient(900px 500px at 110% 10%, #2a1d0c 0%, transparent 50%), #080b10;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2a3648 transparent;
+}
+
+.scene-enter {
+  animation: scene-in 280ms ease-out;
+}
+
+@keyframes scene-in {
+  from {
+    opacity: 0.55;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
