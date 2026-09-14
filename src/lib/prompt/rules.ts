@@ -151,6 +151,11 @@ export function applyPromptRules(layout: SceneLayout, prompt: string, context: R
     const kind = (chartMatch?.[1] ?? "bar") as ChartKind;
     next.chartKind = kind;
     next.showChart = true;
+    if (kind === "waterfall") {
+      next.waterfallMode = /\bopex\b/.test(lower) ? "opex" : "full";
+    } else {
+      next.waterfallMode = undefined;
+    }
     applied.push(`chart → ${kind}`);
   }
 
@@ -199,6 +204,9 @@ export function applyPromptRules(layout: SceneLayout, prompt: string, context: R
     }
     if (/\bwaterfall\b/.test(lower) && (line === "OPEX_TOTAL" || line.startsWith("OPEX_"))) {
       next.chartKind = "waterfall";
+      next.waterfallMode = "opex";
+      next.chartMetrics = ["GROSS_PROFIT", "OPEX_RD", "OPEX_SM", "OPEX_GA", "OPERATING_INCOME"];
+      next.highlightCodes = addUnique(next.highlightCodes, "OPEX_TOTAL");
       next.notes = "Opex walk from gross profit down to operating income.";
       applied.push("opex waterfall");
     }

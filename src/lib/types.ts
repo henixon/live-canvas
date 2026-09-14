@@ -29,6 +29,7 @@ export type SceneLayout = {
   chartKind: ChartKind;
   chartMetrics: LineItemCode[];
   kpiCodes: LineItemCode[];
+  waterfallMode?: "full" | "opex";
   notes?: string;
 };
 

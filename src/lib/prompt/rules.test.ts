@@ -65,7 +65,14 @@ describe("prompt rules", () => {
   it("switches to an opex waterfall", () => {
     const result = applyPromptRules(baseLayout, "switch to waterfall for opex", { periods });
     assert.equal(result.layout.chartKind, "waterfall");
-    assert.ok(result.layout.chartMetrics.includes("OPEX_RD"));
+    assert.equal(result.layout.waterfallMode, "opex");
+    assert.deepEqual(result.layout.chartMetrics, [
+      "GROSS_PROFIT",
+      "OPEX_RD",
+      "OPEX_SM",
+      "OPEX_GA",
+      "OPERATING_INCOME",
+    ]);
     assert.equal(result.layout.showChart, true);
   });
 

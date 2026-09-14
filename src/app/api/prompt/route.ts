@@ -47,7 +47,6 @@ export async function POST(request: Request) {
     where: { id: scene.id },
     data: {
       layout: result.layout,
-      title: result.layout.title.split("·")[0]?.trim() || scene.title,
     },
   });
 

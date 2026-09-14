@@ -44,6 +44,7 @@ function defaultScenes(): Array<{ title: string; sortOrder: number; layout: Scen
         showTable: false,
         showChart: true,
         chartKind: "waterfall",
+        waterfallMode: "full",
         chartMetrics: ["REVENUE", "COGS", "OPEX_TOTAL", "OTHER_INCOME"],
         kpiCodes: ["REVENUE", "GROSS_PROFIT", "OPEX_TOTAL", "NET_INCOME"],
       },

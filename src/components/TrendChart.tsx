@@ -67,9 +67,20 @@ export function TrendChart({
             wrapperStyle={{ color: "#cbd5e1", fontSize: 12 }}
           />
           {metrics.map((code, index) => {
-            const color = highlightCodes.includes(code) ? "#fbbf24" : PALETTE[index % PALETTE.length];
+            const color = PALETTE[index % PALETTE.length];
+            const emphasized = highlightCodes.includes(code);
             if (kind === "bar") {
-              return <Bar key={code} dataKey={code} fill={color} radius={[6, 6, 0, 0]} maxBarSize={36} />;
+              return (
+                <Bar
+                  key={code}
+                  dataKey={code}
+                  fill={color}
+                  radius={[6, 6, 0, 0]}
+                  maxBarSize={36}
+                  stroke={emphasized ? "#fbbf24" : undefined}
+                  strokeWidth={emphasized ? 2 : 0}
+                />
+              );
             }
             if (kind === "area") {
               return (
@@ -80,12 +91,19 @@ export function TrendChart({
                   stroke={color}
                   fill={color}
                   fillOpacity={0.18}
-                  strokeWidth={2.2}
+                  strokeWidth={emphasized ? 3.2 : 2.2}
                 />
               );
             }
             return (
-              <Line key={code} type="monotone" dataKey={code} stroke={color} strokeWidth={2.4} dot={{ r: 3 }} />
+              <Line
+                key={code}
+                type="monotone"
+                dataKey={code}
+                stroke={color}
+                strokeWidth={emphasized ? 3.4 : 2.4}
+                dot={{ r: emphasized ? 4 : 3 }}
+              />
             );
           })}
         </ChartImpl>

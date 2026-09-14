@@ -62,9 +62,7 @@ export function Presenter({ initial }: { initial: CanvasPayload }) {
     return <div className="p-8 text-slate-300">No scenes seeded. Run npm run setup.</div>;
   }
 
-  const opexMode =
-    layout.chartKind === "waterfall" &&
-    layout.chartMetrics.every((code) => code.startsWith("OPEX") || code === "GROSS_PROFIT");
+  const opexMode = layout.chartKind === "waterfall" && layout.waterfallMode === "opex";
 
   return (
     <div className="mx-auto flex min-h-screen max-w-[1400px] flex-col gap-4 px-4 py-5 lg:px-6">
